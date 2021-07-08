@@ -1,26 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+	return (
+		<div className='App'>
+			{/* If no websocket is connected, show name, IP and password input */}
+			{/* Plus button to be able to add more forms for connection */}
+
+			{/* If connected, show connection status, if streaming etc. */}
+
+			{/* Button for adding a trigger */}
+			{/* Active triggers */}
+
+			{/* New trigger form */}
+			{/* When X, dropdown containing all scenes */}
+			{/* Trigger Y/Z, show dropdown for each client containing all their scenes */}
+		</div>
+	);
+};
 
 export default App;
