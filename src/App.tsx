@@ -3,7 +3,7 @@ import ObsWebSocket from 'obs-websocket-js';
 import { sha256 } from 'js-sha256';
 import './App.css';
 
-interface Clients {
+export interface ClientsType {
 	[name: string]: {
 		ws: ObsWebSocket;
 		address: string;
@@ -12,7 +12,7 @@ interface Clients {
 }
 
 const App = () => {
-	const [clients, setClients] = useState<Clients>({});
+	const [clients, setClients] = useState<ClientsType>({});
 	const [lastAction, setLastAction] = useState<string>('');
 
 	const [showForm, setShowForm] = useState<boolean>(false);
