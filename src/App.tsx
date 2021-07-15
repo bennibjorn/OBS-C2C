@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ObsWebSocket from 'obs-websocket-js';
 import { sha256 } from 'js-sha256';
 import './App.css';
+import Clients from './components/clients';
 
 export interface ClientsType {
 	[name: string]: {
@@ -10,6 +11,8 @@ export interface ClientsType {
 		scenes: ObsWebSocket.Scene[];
 	};
 }
+
+export const ClientContext = React.createContext<ClientsType>({});
 
 const App = () => {
 	const [clients, setClients] = useState<ClientsType>({});
@@ -121,9 +124,9 @@ const App = () => {
 		<div className='App'>
 			{/* If no websocket is connected, show name, IP and password input */}
 			{/* Plus button to be able to add more forms for connection */}
-			{!showForm && <button onClick={() => setShowForm(true)}>Add client</button>}
-			{showForm && clientForm()}
-
+			{/* {!showForm && <button onClick={() => setShowForm(true)}>Add client</button>}
+			{showForm && clientForm()} */}
+			<Clients />
 			{/* If connected, show connection status, if streaming etc. */}
 			{Object.keys(clients).map((name) => {
 				return (

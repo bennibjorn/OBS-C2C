@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import ObsWebSocket, { SceneItem } from 'obs-websocket-js';
 import { ClientsType } from '../../App';
+import { clientConnectionHelper } from '../../helpers/connectionHelpers';
+import { useClients } from './clientContext';
 
 const ClientForm = () => {
+	const { clients, setClients } = useClients();
+	const { connect, authenticateIfRequired } = clientConnectionHelper;
 	const [newClientName, setNewClientName] = useState<string>('');
 	const [newClientAddress, setNewClientAddress] = useState<string>('');
 	const [newClientPassword, setNewClientPassword] = useState<string>('');
@@ -20,6 +24,13 @@ const ClientForm = () => {
 		setNewClientAddress('');
 		setNewClientPassword('');
 		// setShowForm(false);
+	};
+	const addClient = async () => {
+		const ws = await connect(newClientName, newClientAddress);
+		ws.on('ConnectionOpened', (data) => {
+			console.log('Clientform connection opened', data);
+			authenticateIfRequired(ws, newClientPassword);
+		});
 	};
 	return (
 		<div>
@@ -39,6 +50,7 @@ const Clients = (clients: ClientsType, setClients: React.Dispatch<React.SetState
 
 	return (
 		<div className='Clients'>
+			<ClientForm></ClientForm>
 			{/* If no websocket is connected, show banner across screen */}
 			{/* Plus button to be able to add more forms for connection */}
 
