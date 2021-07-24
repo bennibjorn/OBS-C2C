@@ -1,31 +1,19 @@
 import Sha256Hash from 'sha.js';
 import ObsWebSocket from 'obs-websocket-js';
-import { useClients } from '../components/clients/clientContext';
 import { Hash } from 'crypto';
 
-const connect = async (name: string, address: string) => {
-	console.log('addClient', name, address);
+const connect = async (name: string, address: string, password: string) => {
+	console.log('connectionHelper - connect', name, address);
 	const ws = new ObsWebSocket();
-
-	ws.on('ConnectionOpened', async () => {
-		console.log('connectionhelper connectionopened');
-		console.log('Connected to ', name);
-
-		// clients[name] = {
-		// 	ws: ws,
-		// 	address: address,
-		// 	scenes: [],
-		// };
-		// setClients(clients);
-	});
-
-	ws.connect({ address, secure: false });
+	const asdf = await ws.connect({ address, password, secure: false });
+	console.log(asdf);
 	return ws;
 };
 
 const authenticateIfRequired = async (ws: ObsWebSocket, password: string) => {
 	try {
 		const authRequired = await ws.send('GetAuthRequired');
+		console.log('authrequired?', authRequired);
 		if (authRequired.authRequired && authRequired.salt && authRequired.challenge) {
 			const authHash = Sha256Hash('sha256');
 			authHash.update(password);

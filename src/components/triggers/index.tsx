@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
-import ObsWebSocket, { SceneItem } from 'obs-websocket-js';
-
-interface Clients {
-	[name: string]: {
-		ws: ObsWebSocket;
-		scenes: ObsWebSocket.Scene[];
-	};
-}
+import { useEffect } from 'react';
+import { useClients } from '../clients/clientContext';
 
 const Triggers = () => {
+	const { clients, connected } = useClients();
+
+	useEffect(() => {
+		console.log('Triggers - clients updated:', clients);
+	}, [connected, clients]);
 	return (
 		<div className='Triggers'>
 			{/* Button for adding a trigger */}

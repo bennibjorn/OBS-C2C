@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import ObsWebSocket, { SceneItem } from 'obs-websocket-js';
-import { ClientsType } from '../../App';
-import { clientConnectionHelper } from '../../helpers/connectionHelpers';
+import ObsWebSocket from 'obs-websocket-js';
+import { useEffect, useState } from 'react';
 import { useClients } from './clientContext';
 
 const ClientForm = () => {
 	const { clients, setClients } = useClients();
-	const { connect, authenticateIfRequired } = clientConnectionHelper;
 	const [newClientName, setNewClientName] = useState<string>('');
 	const [newClientAddress, setNewClientAddress] = useState<string>('');
 	const [newClientPassword, setNewClientPassword] = useState<string>('');
@@ -26,35 +23,75 @@ const ClientForm = () => {
 		// setShowForm(false);
 	};
 	const addClient = async () => {
-		const ws = await connect(newClientName, newClientAddress);
-		ws.on('ConnectionOpened', (data) => {
-			console.log('Clientform connection opened', data);
-			authenticateIfRequired(ws, newClientPassword);
+		const clientsNew = clients;
+		const ws = new ObsWebSocket();
+		ws.connect({ address: newClientAddress, password: newClientPassword, secure: false });
+		ws.on('ConnectionClosed', (data) => {
+			console.log(newClientName, 'disconnected', data);
+		});
+		ws.on('ConnectionOpened', async () => {
+			clientsNew[newClientName] = {
+				ws: ws,
+				address: newClientAddress,
+				scenes: [],
+				authenticated: true,
+			};
+			setClients(clientsNew);
+			console.log(newClientName, 'connected');
+			// const authenticated = await authenticateIfRequired(ws, newClientPassword);
+			// clientsNew[newClientName].authenticated = authenticated;
+			// setClients(clientsNew);
+			resetForm();
 		});
 	};
 	return (
 		<div>
 			<span>Name</span>
-			<input onChange={(event) => onNameChange(event.target.value)} />
+			<input value={newClientName} onChange={(event) => onNameChange(event.target.value)} />
 			<span>Address</span>
-			<input onChange={(event) => onAddressChange(event.target.value)} />
+			<input value={newClientAddress} onChange={(event) => onAddressChange(event.target.value)} />
 			<span>Password</span>
-			<input onChange={(event) => onPasswordChange(event.target.value)} />
+			<input value={newClientPassword} onChange={(event) => onPasswordChange(event.target.value)} />
 			<button onClick={() => addClient()}>Submit</button>
 		</div>
 	);
 };
 
-const Clients = (clients: ClientsType, setClients: React.Dispatch<React.SetStateAction<ClientsType>>) => {
-	const [showForm, setShowForm] = useState<boolean>(false);
+const Clients = () => {
+	const { clients, setClients, connected } = useClients();
+	// const [showForm, setShowForm] = useState<boolean>(false);
+
+	const disconnect = (clientName: string) => {
+		const clientsNew = clients;
+
+		clients[clientName].ws.disconnect();
+		delete clientsNew[clientName];
+		setClients(clientsNew);
+	};
+
+	useEffect(() => {
+		console.log(clients, connected);
+	}, [clients, connected]);
 
 	return (
 		<div className='Clients'>
-			<ClientForm></ClientForm>
+			<ClientForm />
 			{/* If no websocket is connected, show banner across screen */}
 			{/* Plus button to be able to add more forms for connection */}
 
 			{/* If connected, show connection status, if streaming etc. */}
+			{Object.keys(clients).map((name) => {
+				return (
+					<div key={name}>
+						<p>{name} connected</p>
+						<button onClick={() => disconnect(name)}>Disconnect</button>
+						<p>Scenes:</p>
+						{clients[name].scenes.map((scene) => {
+							return <p>{scene.name}</p>;
+						})}
+					</div>
+				);
+			})}
 		</div>
 	);
 };
