@@ -1,6 +1,8 @@
 import ObsWebSocket from 'obs-websocket-js';
 import { useEffect, useState } from 'react';
 import { useClients } from './clientContext';
+import { Label, Input, Select, Textarea, Radio, Checkbox } from '@rebass/forms';
+import { Box, Button, Flex, Text } from 'rebass';
 
 const ClientForm = () => {
 	const { clients, setClients } = useClients();
@@ -37,23 +39,55 @@ const ClientForm = () => {
 				authenticated: true,
 			};
 			setClients(clientsNew);
-			console.log(newClientName, 'connected');
-			// const authenticated = await authenticateIfRequired(ws, newClientPassword);
-			// clientsNew[newClientName].authenticated = authenticated;
-			// setClients(clientsNew);
 			resetForm();
 		});
 	};
 	return (
-		<div>
-			<span>Name</span>
-			<input value={newClientName} onChange={(event) => onNameChange(event.target.value)} />
-			<span>Address</span>
-			<input value={newClientAddress} onChange={(event) => onAddressChange(event.target.value)} />
-			<span>Password</span>
-			<input value={newClientPassword} onChange={(event) => onPasswordChange(event.target.value)} />
-			<button onClick={() => addClient()}>Submit</button>
-		</div>
+		<Box as='form' onSubmit={(e) => e.preventDefault()} py={3}>
+			<Flex flexDirection='column' mx={2} mb={3}>
+				<Box width={1} px={2}>
+					<Label htmlFor='name'>Name</Label>
+					<Input
+						value={newClientName}
+						onChange={(event) => onNameChange(event.target.value)}
+						id='name'
+						name='name'
+						defaultValue=''
+					/>
+				</Box>
+				<Box width={1} px={2}>
+					<Label htmlFor='name'>Address</Label>
+					<Input
+						value={newClientAddress}
+						onChange={(event) => onAddressChange(event.target.value)}
+						id='name'
+						name='name'
+						defaultValue=''
+					/>
+				</Box>
+				<Box width={1} px={2}>
+					<Label htmlFor='name'>Password</Label>
+					<Input
+						value={newClientPassword}
+						onChange={(event) => onPasswordChange(event.target.value)}
+						id='name'
+						name='name'
+						defaultValue=''
+					/>
+				</Box>
+				<Box width={1} px={2} mt={2}>
+					<Button
+						color='black'
+						backgroundColor='#fab'
+						width={1}
+						variant='primary'
+						onClick={() => addClient()}
+					>
+						Connect
+					</Button>
+				</Box>
+			</Flex>
+		</Box>
 	);
 };
 
@@ -74,7 +108,7 @@ const Clients = () => {
 	}, [clients, connected]);
 
 	return (
-		<div className='Clients'>
+		<Flex>
 			<ClientForm />
 			{/* If no websocket is connected, show banner across screen */}
 			{/* Plus button to be able to add more forms for connection */}
@@ -82,17 +116,15 @@ const Clients = () => {
 			{/* If connected, show connection status, if streaming etc. */}
 			{Object.keys(clients).map((name) => {
 				return (
-					<div key={name}>
-						<p>{name} connected</p>
-						<button onClick={() => disconnect(name)}>Disconnect</button>
-						<p>Scenes:</p>
-						{clients[name].scenes.map((scene) => {
-							return <p>{scene.name}</p>;
-						})}
-					</div>
+					<Flex flexDirection='column' key={name}>
+						<Text>{name} connected</Text>
+						<Button backgroundColor='red' onClick={() => disconnect(name)}>
+							Disconnect
+						</Button>
+					</Flex>
 				);
 			})}
-		</div>
+		</Flex>
 	);
 };
 

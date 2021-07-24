@@ -2,26 +2,24 @@ import './App.css';
 import Clients from './components/clients';
 import { ClientProvider } from './components/clients/clientContext';
 import Triggers from './components/triggers';
+import theme from '@rebass/preset';
+import { ThemeProvider } from '@emotion/react';
+import { Box, Flex } from 'rebass';
 
 const App = () => {
 	return (
-		<ClientProvider>
-			<div className='App'>
-				{/* If no websocket is connected, show name, IP and password input */}
-				{/* Plus button to be able to add more forms for connection */}
-				{/* {!showForm && <button onClick={() => setShowForm(true)}>Add client</button>}
-				{showForm && clientForm()} */}
-				<Clients />
-				{/* If connected, show connection status, if streaming etc. */}
-
-				{/* Button for adding a trigger */}
-				{/* Active triggers */}
-				<Triggers />
-				{/* New trigger form */}
-				{/* When X, dropdown containing all scenes */}
-				{/* Trigger Y/Z, show dropdown for each client containing all their scenes */}
-			</div>
-		</ClientProvider>
+		<ThemeProvider theme={theme}>
+			<ClientProvider>
+				<Flex>
+					<Box width={2 / 10}>
+						<Clients />
+					</Box>
+					<Box width={8 / 10}>
+						<Triggers />
+					</Box>
+				</Flex>
+			</ClientProvider>
+		</ThemeProvider>
 	);
 };
 
