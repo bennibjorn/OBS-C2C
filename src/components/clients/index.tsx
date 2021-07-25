@@ -2,8 +2,9 @@ import ObsWebSocket from 'obs-websocket-js';
 import { useEffect, useState } from 'react';
 import { useClients } from './clientContext';
 import { Label, Input } from '@rebass/forms';
-import { Box, Button, Flex, Text } from 'rebass';
+import { Box, Button, Flex } from 'rebass';
 import { toast } from 'react-toastify';
+import ClientEntry from './clientEntry/clientEntry';
 
 const ClientForm = () => {
 	const { clients, setClients } = useClients();
@@ -29,11 +30,18 @@ const ClientForm = () => {
 	const showFormButton = () => {
 		setShowForm(true);
 	};
+
+	const getScenes = async (clientName: string) => {
+		const scenes = await clients[clientName].ws.send('GetSceneList');
+		const clientsNew = clients;
+		clientsNew[clientName].scenes = scenes.scenes;
+		setClients(clientsNew);
+	};
+
 	const addClient = async () => {
 		const clientsNew = clients;
 		const ws = new ObsWebSocket();
-		ws.on('ConnectionClosed', (data) => {
-			console.log(newClientName, 'disconnected', data);
+		ws.on('ConnectionClosed', () => {
 			toast(`${newClientName} disconnected`, { type: 'info' });
 		});
 		ws.on('ConnectionOpened', async () => {
@@ -42,10 +50,15 @@ const ClientForm = () => {
 				ws: ws,
 				address: newClientAddress,
 				scenes: [],
-				authenticated: true,
+				authenticated: false,
 			};
 			setClients(clientsNew);
 			resetForm();
+		});
+		ws.on('AuthenticationSuccess', () => {
+			clientsNew[newClientName].authenticated = true;
+			setClients(clientsNew);
+			getScenes(newClientName);
 		});
 		try {
 			await ws.connect({ address: newClientAddress, password: newClientPassword, secure: false });
@@ -118,16 +131,7 @@ const ClientForm = () => {
 };
 
 const Clients = () => {
-	const { clients, setClients, connected } = useClients();
-	// const [showForm, setShowForm] = useState<boolean>(false);
-
-	const disconnect = (clientName: string) => {
-		const clientsNew = clients;
-
-		clients[clientName].ws.disconnect();
-		delete clientsNew[clientName];
-		setClients(clientsNew);
-	};
+	const { clients, updated: connected } = useClients();
 
 	useEffect(() => {
 		console.log(clients, connected);
@@ -140,26 +144,9 @@ const Clients = () => {
 			{/* Plus button to be able to add more forms for connection */}
 
 			{/* If connected, show connection status, if streaming etc. */}
-			{Object.keys(clients).map((name) => {
-				return (
-					<Flex
-						flexDirection='column'
-						justifyContent='center'
-						alignItems='center'
-						height='150px'
-						width='150px'
-						key={name}
-					>
-						<Text>
-							{name}{' '}
-							<Box width='10px' height='10px' backgroundColor='green' style={{ borderRadius: '8px' }} />
-						</Text>
-						<Button backgroundColor='red' onClick={() => disconnect(name)}>
-							Disconnect
-						</Button>
-					</Flex>
-				);
-			})}
+			{Object.keys(clients).map((name) => (
+				<ClientEntry name={name} />
+			))}
 		</Flex>
 	);
 };

@@ -12,11 +12,11 @@ const App = () => {
 	return (
 		<ThemeProvider theme={theme}>
 			<ClientProvider>
-				<Flex>
-					<Box width={2 / 10}>
+				<Flex flexDirection='column'>
+					<Box>
 						<Clients />
 					</Box>
-					<Box width={8 / 10}>
+					<Box>
 						<Triggers />
 					</Box>
 				</Flex>

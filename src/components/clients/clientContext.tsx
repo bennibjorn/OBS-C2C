@@ -11,23 +11,27 @@ export interface ClientsType {
 	};
 }
 interface ClientContextType {
-	connected: number;
+	updated: Date;
 	clients: ClientsType;
 	setClients: (clients: ClientsType) => void;
 }
 
-const ClientContext = createContext<ClientContextType>({ connected: 0, clients: {}, setClients: () => {} });
+const ClientContext = createContext<ClientContextType>({ updated: new Date(), clients: {}, setClients: () => {} });
 
 export const ClientProvider: FC = ({ children }) => {
 	const [clients, setClientsState] = useState<ClientsType>({});
-	const [connected, setConnected] = useState<number>(0);
+	const [lastUpdated, updateLastUpdated] = useState<Date>(new Date());
 
 	const setClients = (clients: ClientsType) => {
-		setConnected(Object.keys(clients).length);
+		updateLastUpdated(new Date());
 		setClientsState(clients);
 	};
 
-	return <ClientContext.Provider value={{ connected, clients, setClients }}>{children}</ClientContext.Provider>;
+	return (
+		<ClientContext.Provider value={{ updated: lastUpdated, clients, setClients }}>
+			{children}
+		</ClientContext.Provider>
+	);
 };
 
 export const useClients = () => React.useContext(ClientContext);
