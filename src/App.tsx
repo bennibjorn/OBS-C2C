@@ -5,6 +5,8 @@ import Triggers from './components/triggers';
 import theme from '@rebass/preset';
 import { ThemeProvider } from '@emotion/react';
 import { Box, Flex } from 'rebass';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
 	return (
@@ -18,6 +20,7 @@ const App = () => {
 						<Triggers />
 					</Box>
 				</Flex>
+				<ToastContainer />
 			</ClientProvider>
 		</ThemeProvider>
 	);
