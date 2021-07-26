@@ -89,7 +89,6 @@ const ClientForm = () => {
 							onChange={(event) => onNameChange(event.target.value)}
 							id='name'
 							name='name'
-							defaultValue=''
 						/>
 					</Box>
 					<Box width={1} px={2}>
@@ -97,9 +96,8 @@ const ClientForm = () => {
 						<Input
 							value={newClientAddress}
 							onChange={(event) => onAddressChange(event.target.value)}
-							id='name'
-							name='name'
-							defaultValue=''
+							id='address'
+							name='address'
 						/>
 					</Box>
 					<Box width={1} px={2}>
@@ -107,9 +105,8 @@ const ClientForm = () => {
 						<Input
 							value={newClientPassword}
 							onChange={(event) => onPasswordChange(event.target.value)}
-							id='name'
-							name='name'
-							defaultValue=''
+							id='password'
+							name='password'
 						/>
 					</Box>
 					<Box width={1} px={2} mt={2}>
