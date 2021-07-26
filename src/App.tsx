@@ -13,10 +13,10 @@ const App = () => {
 		<ThemeProvider theme={theme}>
 			<ClientProvider>
 				<Flex flexDirection='column'>
-					<Box>
+					<Box height='250px' mb={2}>
 						<Clients />
 					</Box>
-					<Box>
+					<Box p={2}>
 						<Triggers />
 					</Box>
 				</Flex>

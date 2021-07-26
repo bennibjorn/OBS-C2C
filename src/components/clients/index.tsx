@@ -51,6 +51,7 @@ const ClientForm = () => {
 				address: newClientAddress,
 				scenes: [],
 				authenticated: false,
+				triggers: [],
 			};
 			setClients(clientsNew);
 			resetForm();
@@ -60,6 +61,17 @@ const ClientForm = () => {
 			setClients(clientsNew);
 			getScenes(newClientName);
 		});
+		ws.on('SwitchScenes', (data) => {
+			clients[newClientName].triggers.forEach((trigger) => {
+				if (trigger.when.clientName === data['scene-name']) {
+					console.log('trigger triggered:', trigger);
+					// trigger thens
+					trigger.then.forEach((then) => {
+						clients[then.clientName].ws.send('SetCurrentScene', { 'scene-name': then.sceneName });
+					});
+				}
+			});
+		});
 		try {
 			await ws.connect({ address: newClientAddress, password: newClientPassword, secure: false });
 		} catch (err) {
@@ -68,7 +80,7 @@ const ClientForm = () => {
 	};
 	if (showForm) {
 		return (
-			<Box as='form' onSubmit={(e) => e.preventDefault()} py={3}>
+			<Box height='100%' as='form' onSubmit={(e) => e.preventDefault()} py={3}>
 				<Flex flexDirection='column' mx={2} mb={3}>
 					<Box px={2}>
 						<Label htmlFor='name'>Name</Label>
@@ -118,6 +130,7 @@ const ClientForm = () => {
 		return (
 			<Box
 				width='150px'
+				height='250px'
 				p={2}
 				backgroundColor='#222'
 				color='white'

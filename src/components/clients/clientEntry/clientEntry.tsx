@@ -15,17 +15,19 @@ const ClientEntry: FC<{ name: string }> = ({ name }) => {
 
 	return (
 		<Flex
+			backgroundColor='#ccc'
+			style={{ border: '1px solid black' }}
 			flexDirection='column'
 			justifyContent='center'
 			alignItems='center'
-			height='150px'
-			width='150px'
+			height='250px'
+			width='20%'
 			key={name}
 		>
-			<Box width='10px' height='10px' backgroundColor='green' style={{ borderRadius: '8px' }} />
-			<Text>{name}</Text>
+			<Box width='20px' height='20px' backgroundColor='green' style={{ borderRadius: '20px' }} />
+			<Text pt={2}>{name}</Text>
 			<Button backgroundColor='red' onClick={() => disconnect(name)}>
-				Disconnect
+				X
 			</Button>
 		</Flex>
 	);

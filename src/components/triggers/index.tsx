@@ -1,7 +1,9 @@
 import { Select } from '@rebass/forms';
 import ObsWebSocket from 'obs-websocket-js';
 import { useEffect, useState } from 'react';
+import { Heading } from 'rebass';
 import { useClients } from '../clients/clientContext';
+import TriggerForm from './triggerForm/triggerForm';
 
 const Triggers = () => {
 	const { clients, updated } = useClients();
@@ -12,23 +14,10 @@ const Triggers = () => {
 	}, [updated, clients]);
 	return (
 		<div className='Triggers'>
+			<Heading type='h3'>Triggers</Heading>
 			{/* Button for adding a trigger */}
 			{/* Active triggers */}
-			<Select>
-				{Object.keys(clients).map((clientName) => {
-					return clients[clientName].scenes.map((scene) => {
-						return (
-							<option>
-								{clientName}:{scene.name}
-							</option>
-						);
-					});
-				})}
-			</Select>
-
-			{/* New trigger form */}
-			{/* When X, dropdown containing all scenes */}
-			{/* Trigger Y/Z, show dropdown for each client containing all their scenes */}
+			<TriggerForm />
 		</div>
 	);
 };

@@ -2,12 +2,21 @@ import ObsWebSocket from 'obs-websocket-js';
 import React, { FC } from 'react';
 import { createContext, useState } from 'react';
 
+export interface TriggerEntry {
+	clientName: string;
+	sceneName: string;
+}
+export interface Trigger {
+	when: TriggerEntry;
+	then: TriggerEntry[];
+}
 export interface ClientsType {
 	[name: string]: {
 		ws: ObsWebSocket;
 		address: string;
 		scenes: ObsWebSocket.Scene[];
 		authenticated: boolean;
+		triggers: Trigger[];
 	};
 }
 interface ClientContextType {
