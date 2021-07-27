@@ -62,11 +62,14 @@ const ClientForm = () => {
 			getScenes(newClientName);
 		});
 		ws.on('SwitchScenes', (data) => {
+			console.log('switchScenes', data);
 			clients[newClientName].triggers.forEach((trigger) => {
-				if (trigger.when.clientName === data['scene-name']) {
+				console.log('Checking trigger when clientName', trigger, trigger.when.clientName, data['scene-name']);
+				if (trigger.when.sceneName === data['scene-name']) {
 					console.log('trigger triggered:', trigger);
 					// trigger thens
 					trigger.then.forEach((then) => {
+						console.log('send to ', then.clientName, 'to set scene to', then.sceneName);
 						clients[then.clientName].ws.send('SetCurrentScene', { 'scene-name': then.sceneName });
 					});
 				}

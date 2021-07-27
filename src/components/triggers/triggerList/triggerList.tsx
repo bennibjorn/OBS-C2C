@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Button, Flex, Text } from 'rebass';
 import { Trigger, useClients } from '../../clients/clientContext';
 
@@ -36,6 +36,7 @@ const TriggerList: FC<Props> = ({ deleteTrigger }) => {
 						);
 					});
 				}
+				return null;
 			})}
 		</Flex>
 	);

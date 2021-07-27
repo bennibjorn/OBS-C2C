@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Button, Flex, Text } from 'rebass';
-import { Trigger, TriggerEntry } from '../../clients/clientContext';
+import { Trigger, TriggerEntry, useClients } from '../../clients/clientContext';
 import SceneSelector from '../sceneSelector/sceneSelector';
 
 interface Props {
@@ -9,29 +9,39 @@ interface Props {
 }
 
 const TriggerForm: FC<Props> = ({ saveTrigger }) => {
+	const { clients, updated } = useClients();
 	const [showForm, setShowForm] = useState<boolean>(false);
-	const [whenValue, setWhenValue] = useState<TriggerEntry>();
+	const [whenValue, setWhenValue] = useState<TriggerEntry>({ clientName: '', sceneName: '' });
 	const [thenValues, setThenValues] = useState<TriggerEntry[]>([]);
+
+	useEffect(() => {
+		// check all whens/thens for disconnected clients and remove
+		const clientNames = Object.keys(clients);
+		const thenIndex = thenValues.findIndex((x) => !clientNames.includes(x.clientName));
+		if (thenIndex !== -1) {
+			const newThens = thenValues;
+			newThens.splice(thenIndex);
+			setThenValues(newThens);
+		}
+		if (whenValue?.clientName && !clientNames.includes(whenValue.clientName)) {
+			setWhenValue({ clientName: '', sceneName: '' });
+		}
+	}, [clients, updated, whenValue, thenValues]);
 
 	const addThenValue = (clientName: string, sceneName: string) => {
 		const newThenValues = thenValues;
-		thenValues.concat({ clientName, sceneName });
+		newThenValues.push({ clientName, sceneName });
 		setThenValues(newThenValues);
-	};
-	const removeThenValue = (entry: TriggerEntry) => {
-		const newThenValues = thenValues;
-		const index = newThenValues.findIndex(
-			(x) => x.clientName === entry.clientName && x.sceneName === entry.sceneName
-		);
-		if (index !== -1) {
-			newThenValues.splice(index, 1);
-			setThenValues(newThenValues);
-		}
 	};
 
 	const changeWhenValue = (clientName: string, sceneName: string) => {
 		// check all then values and reset if they contain the same clientName
-
+		const thenIndex = thenValues.findIndex((x) => x.clientName === clientName);
+		if (thenIndex !== -1) {
+			const newThens = thenValues;
+			newThens.splice(thenIndex);
+			setThenValues(newThens);
+		}
 		// replace when value
 		setWhenValue({ clientName, sceneName });
 	};
@@ -46,44 +56,55 @@ const TriggerForm: FC<Props> = ({ saveTrigger }) => {
 		};
 		saveTrigger(trigger);
 	};
+	const getSkippedClients = (currentIndex: number) => {
+		const skippedClientNames: string[] = whenValue?.clientName ? [whenValue.clientName] : [];
+		thenValues.forEach((entry, index) => {
+			if (index !== currentIndex) {
+				skippedClientNames.push(entry.clientName);
+			}
+		});
+		return skippedClientNames;
+	};
+	const addEmptyThen = () => {
+		const newThens = thenValues;
+		newThens.push({ clientName: '', sceneName: '' });
+		setThenValues(newThens);
+	};
 
-	// if (Object.keys(clients).length > 1) {
-	// 	// not enough clients for triggers to work
-	// 	// TODO: enable this before release
-	// 	return null;
-	// }
+	if (Object.keys(clients).length <= 1) {
+		// not enough clients for triggers to work
+		// TODO: enable this before release
+		return null;
+	}
 	if (showForm) {
 		return (
 			<Flex flexDirection='row' width='100%'>
 				<Flex mr={4} backgroundColor='#dadada' width='20%' alignItems='center' justifyContent='space-between'>
-					<Text fontWeight='bold'>When</Text>
-					<SceneSelector skipClients={[]} select={changeWhenValue} />
+					<Text fontWeight='bold'>When:</Text>
+					<SceneSelector initialValue={whenValue} skipClients={[]} select={changeWhenValue} />
 				</Flex>
-				<Flex width='20%' alignItems='center' justifyContent='space-between'>
-					<Text>Then</Text>
-					{thenValues.map((entry) => {
+				<Flex width='20%' alignItems='center' flexWrap='wrap' justifyContent='space-between'>
+					<Text>Then:</Text>
+					{thenValues.map((then, index) => {
+						console.log('mapped then values', then, index);
 						return (
-							<Flex>
-								<Text>
-									{entry.clientName} - {entry.sceneName}
-								</Text>
-								<Button onClick={() => removeThenValue(entry)}>X</Button>
-							</Flex>
+							<SceneSelector
+								key={'then' + index}
+								initialValue={then}
+								skipClients={getSkippedClients(index)}
+								select={addThenValue}
+							/>
 						);
 					})}
-					<SceneSelector
-						skipClients={thenValues
-							.map((x) => x.clientName)
-							.concat(whenValue?.clientName ? [whenValue.clientName] : [])}
-						select={addThenValue}
-					/>
 				</Flex>
+				{thenValues.length + 1 < Object.keys(clients).length && (
+					<Button backgroundColor='green' onClick={() => addEmptyThen()}>
+						+
+					</Button>
+				)}
 				<Button backgroundColor='blue' onClick={() => submit()}>
 					Save
 				</Button>
-				{/* New trigger form */}
-				{/* When X, dropdown containing all scenes */}
-				{/* Trigger Y/Z, show dropdown for each client containing all their scenes */}
 			</Flex>
 		);
 	} else {

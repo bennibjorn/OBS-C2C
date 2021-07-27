@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { Heading } from 'rebass';
+import { Box, Heading } from 'rebass';
 import { Trigger, useClients } from '../clients/clientContext';
 import TriggerForm from './triggerForm/triggerForm';
 import TriggerList from './triggerList/triggerList';
@@ -10,6 +9,7 @@ const Triggers = () => {
 	const saveTrigger = (trigger: Trigger) => {
 		const clientsNew = clients;
 		clientsNew[trigger.when.clientName].triggers.push(trigger);
+		console.log('save new trigger', trigger, clientsNew[trigger.when.clientName]);
 		setClients(clientsNew);
 	};
 
@@ -26,14 +26,17 @@ const Triggers = () => {
 		setClients(clientsNew);
 	};
 
-	useEffect(() => {
-		console.log('Triggers - clients updated:', clients);
-	}, [updated, clients]);
 	return (
 		<div className='Triggers'>
-			<Heading type='h3'>Triggers</Heading>
-			<TriggerForm saveTrigger={saveTrigger} />
-			<TriggerList deleteTrigger={deleteTrigger} />
+			<Heading mb={4} type='h3'>
+				Triggers
+			</Heading>
+			<Box p={2} mb={4}>
+				<TriggerForm saveTrigger={saveTrigger} />
+			</Box>
+			<Box p={2}>
+				<TriggerList deleteTrigger={deleteTrigger} />
+			</Box>
 		</div>
 	);
 };
